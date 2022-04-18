@@ -11,6 +11,8 @@ contract Airdrop is Ownable {
 
     event Claim(address indexed user, uint256 id, uint256 amount);
     event SetSigner(address signer);
+    event Deposit(address indexed sender, uint256 amount);
+    event Withdraw(address indexed sender, uint256 amount);
 
     constructor(address _signer) {
         setSigner(_signer);
@@ -62,5 +64,10 @@ contract Airdrop is Ownable {
             amount = address(this).balance;
         }
         payable(msg.sender).transfer(amount);
+        emit Withdraw(msg.sender, amount);
+    }
+
+    receive() external payable {
+        emit Deposit(msg.sender, msg.value);
     }
 }
