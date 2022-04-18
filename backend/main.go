@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/acoshift/arpc/v2"
 	"github.com/acoshift/pgsql/pgctx"
@@ -13,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	_ "github.com/lib/pq"
 	"github.com/moonrhythm/parapet"
+	"github.com/moonrhythm/parapet/pkg/cors"
 
 	"github.com/reichain/airdrop/backend/airdrop"
 )
@@ -71,6 +73,12 @@ func main() {
 
 	srv := parapet.NewBackend()
 	srv.Use(parapet.MiddlewareFunc(pgctx.Middleware(db)))
+	srv.Use(cors.CORS{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"POST"},
+		AllowHeaders:    []string{"Content-Type"},
+		MaxAge:          time.Hour,
+	})
 	srv.Handler = mux
 	srv.Addr = net.JoinHostPort(host, port)
 
