@@ -8,7 +8,6 @@ import useScrollTrigger from '@material-ui/core/useScrollTrigger'
 import Close from '@material-ui/icons/Close'
 import Menu from '@material-ui/icons/Menu'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import styles from './styles'
 
 const useStyles = makeStyles(styles)
@@ -30,16 +29,16 @@ const Header = ({ links }: HeaderProps) => {
     return (
         <AppBar className={`${classes.header}`}>
             <Toolbar className={classes.container}>
-                <Link
+                <a
                     className="_pdv-8px _pdh-24px _bgcl-shader-hover "
-                    to="/"
+                    href="https://reichain.io/"
                     title="Go to main page"
                 >
                     <img
                         className="_h-32px _h-48px-sm _pdv-4px _mgr-12px"
                         src="./images/text-logo.svg"
                     />
-                </Link>
+                </a>
 
                 <Hidden smDown implementation="js">
                     <div className={classes.collapse}>{links}</div>

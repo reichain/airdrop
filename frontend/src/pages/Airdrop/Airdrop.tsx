@@ -6,10 +6,9 @@ import { memo, useCallback, useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import LockerItem, { AirdropItem } from './components/LockerItem/LockerItem'
 
-const fetchAirdropList = (account: string) => {
+const fetchAirdropList = (address: string) => {
     return axios.post(`${process.env.REACT_APP_REI_API}/list`, {
-        address: '0xB00Bc63f09ebC962E205d85d0226ec87251bfE17',
-        // address: account,
+        address,
     })
 }
 
@@ -25,15 +24,24 @@ const Airdrop = () => {
     }, [connectWallet])
 
     useEffect(() => {
-        if (!address) {
-            return
+        const fetch = async () => {
+            if (!address) {
+                return
+            }
+            try {
+                const { data } = await fetchAirdropList(address)
+                const { orders } = data.result
+                setFetchAirdropListPending(false)
+                setFetchAirdropListDone(true)
+                if (orders && orders.length) {
+                    setAirdropList(orders)
+                }
+            } catch (error) {
+                console.error(error)
+            }
         }
 
-        fetchAirdropList(address).then((response) => {
-            setFetchAirdropListPending(false)
-            setFetchAirdropListDone(true)
-            setAirdropList(response.data.result)
-        })
+        fetch()
     }, [address])
 
     /* Render Section Below */
@@ -118,7 +126,7 @@ const Wrapper = () => (
         className="_mgh-at _pdh-24px _pdh-48px-sm _bdrd-8px _bdfb-4px _mgt-0px _mgt-32px-md _mgbt-32px _zid-1"
         style={{ maxWidth: 1000, paddingTop: 'var(--header-height)' }}
     >
-        <div className="_fs-800 _fw-500 _mgbt-12px _mgbt-24px-sm _w-fc _bdrd-8px _bdfb-4px">
+        <div className="_fs-800 _fw-500 _mgt-16px _mgt-4px-md _mgbt-12px _mgbt-24px-md _w-fc _bdrd-8px _bdfb-4px">
             Airdrop
         </div>
         <Airdrop />

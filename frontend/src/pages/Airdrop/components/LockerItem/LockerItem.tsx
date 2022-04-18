@@ -15,14 +15,13 @@ import './styles.scss'
 
 export interface AirdropItem {
     id: string
-    token: 'KSW'
-    wallet: string
-    tokenAddr: string
-    amountWei: string
-    unlockAt: string
-    expiresAt: string
+    address: string
+    amount: string
+    unlock_at: string
+    expires_at: string
+    detail?: string
+
     wasRedeemed?: boolean
-    description?: string
 }
 
 interface LockerItemProps {
@@ -68,12 +67,14 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
             return
         }
         const fetch = () => {
-            if (airdropItem && new Date(airdropItem?.unlockAt) <= new Date()) {
+            if (airdropItem && new Date(airdropItem?.unlock_at) <= new Date()) {
                 return fetchRedeemStatus().then((wasRedeemed) => {
                     setIsFetchingAirdropRedeem(false)
                     if (wasRedeemed) {
                         return setAirdropItemStatus(AirdropItemStatus.redeemed)
-                    } else if (new Date(airdropItem?.expiresAt) <= new Date()) {
+                    } else if (
+                        new Date(airdropItem?.expires_at) <= new Date()
+                    ) {
                         return setAirdropItemStatus(AirdropItemStatus.expired)
                     } else {
                         return setAirdropItemStatus(
@@ -92,12 +93,14 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
     }, [fetchRedeemStatus, networkId, provider, airdropItem])
 
     const airdropUnlockAt = useMemo(() => {
-        return airdropItem?.unlockAt ? new Date(airdropItem?.unlockAt) : null
-    }, [airdropItem?.unlockAt])
+        return airdropItem?.unlock_at ? new Date(airdropItem?.unlock_at) : null
+    }, [airdropItem?.unlock_at])
 
     const airdropExpiresAt = useMemo(() => {
-        return airdropItem?.expiresAt ? new Date(airdropItem?.expiresAt) : null
-    }, [airdropItem?.expiresAt])
+        return airdropItem?.expires_at
+            ? new Date(airdropItem?.expires_at)
+            : null
+    }, [airdropItem?.expires_at])
 
     const airdropRedeemableCountdown = useMemo(() => {
         if (airdropItemStatus === AirdropItemStatus.redeemed) {
@@ -151,7 +154,13 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
                 id: airdropItem.id,
             })
 
-            return data.result
+            return data.result as {
+                address: string
+                amount: string
+                deadline: number
+                id: string
+                signature: string
+            }
         } catch (e) {
             console.error(e)
             throw e
@@ -174,12 +183,9 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
         setIsRedeeming(true)
 
         try {
-            const { tokenAddr, amountWei, deadline, signature } =
-                await fetchClaimDetailApi()
+            const { amount, deadline, signature } = await fetchClaimDetailApi()
             if (process.env?.NODE_ENV === 'development') {
                 console.log('fetchClaimDetailApi result', {
-                    tokenAddr,
-                    amountWei,
                     deadline,
                     signature,
                 })
@@ -190,7 +196,7 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
             )
             await airdropContract
                 .connect(provider.getSigner())
-                .claim(airdropItem.id, amountWei, deadline, signature)
+                .claim(airdropItem.id, amount, deadline, signature)
                 .then((tx) => tx.wait())
 
             enqueueSnackbar('Redeem success', {
@@ -217,11 +223,10 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
             <div className="layout _f-1 _gg-12px _w-100pct _w-us-sm">
                 <div className="_dp-f _alit-ct _jtfs-st-sm _jtfs-ct">
                     <TokenLogo
-                        name={airdropItem?.token || 'Token'}
+                        name={'REI'}
                         logoUrls={
-                            networkToken?.find(
-                                (item) => item.symbol === airdropItem?.token
-                            )?.logoURIs || []
+                            networkToken?.find((item) => item.symbol === 'REI')
+                                ?.logoURIs || []
                         }
                         width={50}
                     />
@@ -231,9 +236,9 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
                             {airdropItem
                                 ? `${ethers.utils.commify(
                                       ethers.utils.formatEther(
-                                          airdropItem?.amountWei
+                                          airdropItem?.amount
                                       )
-                                  )} ${airdropItem?.token}`
+                                  )} ${'REI'}`
                                 : '..'}
                         </div>
                     </div>
@@ -241,7 +246,7 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
 
                 <LabeledStat
                     label="Description"
-                    value={airdropItem.description || '-'}
+                    value={airdropItem.detail || '-'}
                 />
                 <Tooltip
                     enterTouchDelay={0}
