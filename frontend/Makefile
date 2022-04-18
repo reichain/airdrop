@@ -11,4 +11,4 @@ deploy-ipfs:
 
 publish-ipfs:
 	echo $(HASH)
-	deploys route create -project=reichain -location=gke.cluster-rcf2 -domain=reichain.io -deployment=ipfs://$(HASH)
+	deploys route create -project=reichain -location=gke.cluster-rcf2 -domain=airdrop.reichain.io -deployment=ipfs://$(HASH)

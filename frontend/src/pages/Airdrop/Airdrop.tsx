@@ -2,7 +2,9 @@ import axios from 'axios'
 import { useEtherProvider } from 'components/EtherProvider/EtherProvider'
 import Loader from 'components/Loader/Loader'
 import { createWeb3Modal } from 'helpers/createWeb3Modal'
+import { useSnackbar } from 'notistack'
 import { memo, useCallback, useEffect, useState } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import LockerItem, { AirdropItem } from './components/LockerItem/LockerItem'
 
@@ -16,7 +18,13 @@ const Airdrop = () => {
     const { address, connected, connectWallet } = useEtherProvider()
     const [fetchAirdropListPending, setFetchAirdropListPending] = useState(true)
     const [fetchAirdropListDone, setFetchAirdropListDone] = useState(false)
+    const [error, setError] = useState(null)
     const [airdropList, setAirdropList] = useState([] as AirdropItem[])
+    const { enqueueSnackbar } = useSnackbar()
+
+    if (error) {
+        throw error
+    }
 
     const handleConnectWallet = useCallback(() => {
         const web3Modal = createWeb3Modal()
@@ -31,18 +39,27 @@ const Airdrop = () => {
             try {
                 const { data } = await fetchAirdropList(address)
                 const { orders } = data.result
-                setFetchAirdropListPending(false)
                 setFetchAirdropListDone(true)
                 if (orders && orders.length) {
                     setAirdropList(orders)
                 }
             } catch (error) {
                 console.error(error)
+                enqueueSnackbar(
+                    `Load Airdrop List error: ${
+                        error?.data?.message || error?.message || error
+                    }`,
+                    {
+                        variant: 'error',
+                    }
+                )
+                setError(error)
             }
+            setFetchAirdropListPending(false)
         }
 
         fetch()
-    }, [address])
+    }, [address, enqueueSnackbar])
 
     /* Render Section Below */
 
@@ -129,7 +146,15 @@ const Wrapper = () => (
         <div className="_fs-800 _fw-500 _mgt-16px _mgt-4px-md _mgbt-12px _mgbt-24px-md _w-fc _bdrd-8px _bdfb-4px">
             Airdrop
         </div>
-        <Airdrop />
+        <ErrorBoundary
+            FallbackComponent={() => (
+                <div className="rei-card _pd-24px _mgv-12px _mgl-8px _bdfb-4px _lh-150pct">
+                    Some error occurred. Please wait until our devs fix it.
+                </div>
+            )}
+        >
+            <Airdrop />
+        </ErrorBoundary>
     </div>
 )
 
