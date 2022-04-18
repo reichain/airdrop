@@ -72,13 +72,13 @@ func main() {
 	}
 
 	srv := parapet.NewBackend()
-	srv.Use(parapet.MiddlewareFunc(pgctx.Middleware(db)))
 	srv.Use(cors.CORS{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"POST"},
 		AllowHeaders:    []string{"Content-Type"},
 		MaxAge:          time.Hour,
 	})
+	srv.Use(parapet.MiddlewareFunc(pgctx.Middleware(db)))
 	srv.Handler = mux
 	srv.Addr = net.JoinHostPort(host, port)
 
