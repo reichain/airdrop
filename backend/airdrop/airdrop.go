@@ -161,7 +161,7 @@ func Claim(ctx context.Context, req *ClaimRequest) (*ClaimResult, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	sig[64] += 27
 	x.Signature = hexutil.Encode(sig[:])
 	x.Deadline = deadline
 
