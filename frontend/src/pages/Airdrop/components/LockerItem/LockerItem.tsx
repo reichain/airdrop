@@ -183,9 +183,13 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
         setIsRedeeming(true)
 
         try {
-            const { amount, deadline, signature } = await fetchClaimDetailApi()
+            const { id, amount, deadline, signature } =
+                await fetchClaimDetailApi()
             if (process.env?.NODE_ENV === 'development') {
                 console.log('fetchClaimDetailApi result', {
+                    id,
+                    id2: airdropItem.id,
+                    amount,
                     deadline,
                     signature,
                 })
@@ -196,13 +200,16 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
             )
             await airdropContract
                 .connect(provider.getSigner())
-                .claim(airdropItem.id, amount, deadline, signature)
+                .claim(airdropItem.id, amount, deadline, signature, {
+                    gasLimit: 1_000_000,
+                })
                 .then((tx) => tx.wait())
 
             enqueueSnackbar('Redeem success', {
                 variant: 'success',
             })
         } catch (error) {
+            console.error(error)
             enqueueSnackbar(
                 `Redeem error: ${
                     error?.data?.message || error?.message || error

@@ -13,17 +13,15 @@ import reportWebVitals from './reportWebVitals'
 import './styles/index.scss'
 
 ReactDOM.render(
-    <React.StrictMode>
-        <HashRouter>
-            <ThemeProvider>
-                <SnackbarProviderWrapper>
-                    <EtherProvider>
-                        <App />
-                    </EtherProvider>
-                </SnackbarProviderWrapper>
-            </ThemeProvider>
-        </HashRouter>
-    </React.StrictMode>,
+    <HashRouter>
+        <ThemeProvider>
+            <SnackbarProviderWrapper>
+                <EtherProvider>
+                    <App />
+                </EtherProvider>
+            </SnackbarProviderWrapper>
+        </ThemeProvider>
+    </HashRouter>,
     document.getElementById('root')
 )
 
