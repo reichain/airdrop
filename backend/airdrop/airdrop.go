@@ -99,6 +99,7 @@ type ClaimRequest struct {
 
 type ClaimResult struct {
 	ID        string `json:"id"`
+	Contract  string `json:"contract"`
 	Address   string `json:"address"`
 	Amount    string `json:"amount"`
 	Deadline  int64  `json:"deadline"`
@@ -164,6 +165,7 @@ func Claim(ctx context.Context, req *ClaimRequest) (*ClaimResult, error) {
 	sig[64] += 27
 	x.Signature = hexutil.Encode(sig[:])
 	x.Deadline = deadline
+	x.Contract = ContractAddress.String()
 
 	return &x, nil
 }
