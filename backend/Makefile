@@ -1,5 +1,5 @@
 COMMIT_SHA=$(shell git rev-parse HEAD)
-DOCKER_IMAGE=gcr.io/moonrhythm-containers/rei-airdrop-backend
+DOCKER_IMAGE=asia-southeast1-docker.pkg.dev/reichain/docker/airdrop-backend
 
 docker:
 	buildctl build \
