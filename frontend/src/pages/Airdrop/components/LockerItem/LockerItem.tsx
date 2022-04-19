@@ -155,6 +155,7 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
             })
 
             return data.result as {
+                contract: string
                 address: string
                 amount: string
                 deadline: number
@@ -183,7 +184,7 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
         setIsRedeeming(true)
 
         try {
-            const { id, amount, deadline, signature } =
+            const { id, amount, deadline, signature, contract } =
                 await fetchClaimDetailApi()
             if (process.env?.NODE_ENV === 'development') {
                 console.log('fetchClaimDetailApi result', {
@@ -192,12 +193,10 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
                     amount,
                     deadline,
                     signature,
+                    contract,
                 })
             }
-            const airdropContract = Airdrop__factory.connect(
-                getAirdrop(networkId).address,
-                provider
-            )
+            const airdropContract = Airdrop__factory.connect(contract, provider)
             await airdropContract
                 .connect(provider.getSigner())
                 .claim(airdropItem.id, amount, deadline, signature, {
@@ -220,7 +219,7 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
             )
         }
         setIsRedeeming(false)
-    }, [fetchClaimDetailApi, enqueueSnackbar, networkId, airdropItem, provider])
+    }, [fetchClaimDetailApi, enqueueSnackbar, airdropItem, provider])
 
     return (
         <div className="rei-card airdrop-locker-item-summary _pst-rlt _dp-f _fdrt-r-sm _fdrt-cl _pdv-24px _pdv-16px-sm _pdh-32px _alit-ct">
