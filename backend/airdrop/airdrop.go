@@ -57,8 +57,9 @@ type ListRequest struct {
 }
 
 type ListResult struct {
-	Address string   `json:"address"`
-	Orders  []*Order `json:"orders"`
+	Address  string   `json:"address"`
+	Contract string   `json:"contract"`
+	Orders   []*Order `json:"orders"`
 }
 
 // List lists orders for given address
@@ -67,6 +68,7 @@ func List(ctx context.Context, req *ListRequest) (*ListResult, error) {
 
 	var res ListResult
 	res.Address = addr.String()
+	res.Contract = ContractAddress.String()
 	err := pgctx.Iter(ctx, func(scan pgsql.Scanner) error {
 		var x Order
 		err := scan(&x.ID, &x.Address, &x.Amount, &x.Detail, &x.UnlockAt, &x.ExpiresAt)
