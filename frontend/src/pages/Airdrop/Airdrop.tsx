@@ -18,6 +18,7 @@ const Airdrop = () => {
     const { address, connected, connectWallet } = useEtherProvider()
     const [fetchAirdropListPending, setFetchAirdropListPending] = useState(true)
     const [fetchAirdropListDone, setFetchAirdropListDone] = useState(false)
+    const [contractAddress, setContractAddress] = useState<string>()
     const [error, setError] = useState(null)
     const [airdropList, setAirdropList] = useState([] as AirdropItem[])
     const { enqueueSnackbar } = useSnackbar()
@@ -38,10 +39,11 @@ const Airdrop = () => {
             }
             try {
                 const { data } = await fetchAirdropList(address)
-                const { orders } = data.result
+                const { orders, contract } = data.result
                 setFetchAirdropListDone(true)
                 if (orders && orders.length) {
                     setAirdropList(orders)
+                    setContractAddress(contract)
                 }
             } catch (error) {
                 console.error(error)
@@ -128,6 +130,7 @@ const Airdrop = () => {
                                 <LockerItem
                                     key={airdrop.id}
                                     airdropItem={airdrop}
+                                    contractAddress={contractAddress}
                                 />
                             ))}
                         </InfiniteScroll>

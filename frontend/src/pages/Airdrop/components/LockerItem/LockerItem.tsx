@@ -5,7 +5,7 @@ import { useEtherProvider } from 'components/EtherProvider/EtherProvider'
 import OnTopCard from 'components/OnTopCard/OnTopCard'
 import TokenLogo from 'components/TokenLogo/TokenLogo'
 import { ethers } from 'ethers'
-import { getAirdrop, getNetworkTokens } from 'helpers/getNetworkData'
+import { getNetworkTokens } from 'helpers/getNetworkData'
 import { useSnackbar } from 'notistack'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Airdrop__factory } from 'typechain'
@@ -26,6 +26,7 @@ export interface AirdropItem {
 
 interface LockerItemProps {
     airdropItem: AirdropItem
+    contractAddress?: string
 }
 
 enum AirdropItemStatus {
@@ -35,7 +36,7 @@ enum AirdropItemStatus {
     'expired' = 'expired',
 }
 
-const LockerItem = ({ airdropItem }: LockerItemProps) => {
+const LockerItem = ({ airdropItem, contractAddress }: LockerItemProps) => {
     const { provider, networkId, address } = useEtherProvider()
     const { enqueueSnackbar } = useSnackbar()
     const [isRedeeming, setIsRedeeming] = useState(false)
@@ -45,12 +46,12 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
     const [isFetchingAirdropRedeem, setIsFetchingAirdropRedeem] = useState(true)
 
     const fetchRedeemStatus = useCallback(async () => {
-        if (!provider) {
+        if (!provider || !contractAddress) {
             return
         }
         try {
             const airdropContract = Airdrop__factory.connect(
-                getAirdrop(networkId).address,
+                contractAddress,
                 provider
             )
 
@@ -60,10 +61,10 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
             throw e
         }
         return false
-    }, [provider, airdropItem, networkId])
+    }, [provider, airdropItem, contractAddress])
 
     useEffect(() => {
-        if (!provider || !networkId) {
+        if (!provider || !networkId || !contractAddress) {
             return
         }
         const fetch = () => {
@@ -90,7 +91,7 @@ const LockerItem = ({ airdropItem }: LockerItemProps) => {
         fetch()
         const id = setInterval(fetch, 5000)
         return () => clearInterval(id)
-    }, [fetchRedeemStatus, networkId, provider, airdropItem])
+    }, [fetchRedeemStatus, networkId, provider, airdropItem, contractAddress])
 
     const airdropUnlockAt = useMemo(() => {
         return airdropItem?.unlock_at ? new Date(airdropItem?.unlock_at) : null

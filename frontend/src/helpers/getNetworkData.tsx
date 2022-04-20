@@ -105,18 +105,3 @@ export const getNetworkConnectors = (): Partial<ICoreOptions> => {
         },
     }
 }
-
-export const getAirdrop = (networkId: number) => {
-    switch (networkId) {
-        case CHAIN.REI:
-            return {
-                isEnable: true,
-                address: '0x12CB3f5C6181aEE015021F975dd20f2fA82Cbb72',
-            }
-        default:
-            return {
-                isEnable: false,
-                address: '',
-            }
-    }
-}
