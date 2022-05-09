@@ -1,7 +1,9 @@
 import axios from 'axios'
 import { useEtherProvider } from 'components/EtherProvider/EtherProvider'
 import Loader from 'components/Loader/Loader'
+import { CHAIN, networkSettings } from 'config/networkSetup'
 import { createWeb3Modal } from 'helpers/createWeb3Modal'
+import { switchNetwork } from 'helpers/switchNetwork'
 import { useSnackbar } from 'notistack'
 import { memo, useCallback, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -15,7 +17,8 @@ const fetchAirdropList = (address: string) => {
 }
 
 const Airdrop = () => {
-    const { address, connected, connectWallet } = useEtherProvider()
+    const { address, connected, networkId, provider, connectWallet } =
+        useEtherProvider()
     const [fetchAirdropListPending, setFetchAirdropListPending] = useState(true)
     const [fetchAirdropListDone, setFetchAirdropListDone] = useState(false)
     const [contractAddress, setContractAddress] = useState<string>()
@@ -34,7 +37,7 @@ const Airdrop = () => {
 
     useEffect(() => {
         const fetch = async () => {
-            if (!address) {
+            if (!address || networkId !== CHAIN.DEFAULT) {
                 return
             }
             try {
@@ -61,7 +64,7 @@ const Airdrop = () => {
         }
 
         fetch()
-    }, [address, enqueueSnackbar])
+    }, [address, enqueueSnackbar, networkId])
 
     /* Render Section Below */
 
@@ -76,6 +79,32 @@ const Airdrop = () => {
                         onClick={handleConnectWallet}
                     >
                         Connect Wallet
+                    </button>
+                </div>
+            </>
+        )
+    }
+
+    if (networkId !== CHAIN.DEFAULT) {
+        return (
+            <>
+                <div className="rei-card _mgv-at _mgh-at _zid-1 _pd-24px _tal-ct _dp-f _fdrt-cl _lh-130pct">
+                    <i className="far fa-info-circle"></i> &nbsp;Please switch
+                    to REI Chain network.
+                    <button
+                        className="rei-button _w-fc _mgh-at _mgt-24px"
+                        onClick={() => {
+                            if (!provider) {
+                                return
+                            }
+                            switchNetwork({
+                                provider,
+                                network: networkSettings[CHAIN.DEFAULT],
+                                enqueueSnackbar,
+                            })
+                        }}
+                    >
+                        Switch to REI Chain
                     </button>
                 </div>
             </>
