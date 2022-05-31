@@ -66,8 +66,8 @@ function App() {
 
     useEffect(() => {
         // initializeGTM()
-        initializeFirebase()
-        setAnalyticsEnabled(true)
+        // initializeFirebase()
+        // setAnalyticsEnabled(true)
     }, [])
 
     const location = useLocation()
