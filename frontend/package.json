@@ -54,7 +54,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "dev": "npm run start",
+    "dev": "yarn start",
     "build": "BUILD_PATH='./dist' react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject"
@@ -70,5 +70,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2"
   }
 }
