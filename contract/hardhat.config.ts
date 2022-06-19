@@ -1,29 +1,12 @@
 import * as dotenv from 'dotenv'
 
-import { HardhatUserConfig, subtask } from 'hardhat/config'
+import { HardhatUserConfig } from 'hardhat/config'
 import '@nomiclabs/hardhat-etherscan'
 import '@nomiclabs/hardhat-waffle'
 import '@typechain/hardhat'
 import 'solidity-coverage'
-const {
-    getEtherscanEndpoints,
-} = require('@nomiclabs/hardhat-etherscan/dist/src/network/prober')
 
 dotenv.config()
-
-const chainConfig: any = {
-  rei: {
-      chainId: 55555,
-      urls: {
-          apiURL: 'https://reiscan.com/api',
-          browserURL: 'https://reiscan.com/'
-      }
-  }
-}
-
-subtask('verify:get-etherscan-endpoint').setAction(async (_, { network }) =>
-    getEtherscanEndpoints(network.provider, network.name, chainConfig)
-)
 
 const config: HardhatUserConfig = {
   solidity: '0.8.13',
@@ -36,7 +19,17 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: ':D',
-  },
+    customChains: [
+      {
+        network: 'rei',
+        chainId: 55555,
+        urls: {
+          apiURL: 'https://reiscan.com/api',
+          browserURL: 'https://reiscan.com/'
+        }
+      }
+    ]
+  }
 }
 
 export default config
